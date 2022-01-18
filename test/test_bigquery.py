@@ -496,6 +496,12 @@ class TestBigQuery(TestBaseClass): # We can use TestLoadDataWarehouse instead if
 
         self.assertIsInstance(table, bigquery.table.Table)
 
+        # load_bigquery_table(
+        #     _client,
+        #     table,
+            
+        # )
+
         drop_bigquery_table(
             _client,
             table,
@@ -506,24 +512,7 @@ class TestBigQuery(TestBaseClass): # We can use TestLoadDataWarehouse instead if
             get_bigquery_table(_client, _test_table),
             WarehouseTableNotFound
         )
-        
-    # def test_nothing(self):
-        
-    #     # print(load_bigquery_table(
-    #     #     _client,
-    #     #     table="bim-manufacturer-metadata.data_staging.erco_sku_specsheets",
-    #     #     data=json.load(self.get_testdata("sku_specsheet_combined.json", file_like=True)),
-    #     #     schema=None,
-    #     #     full_schema=False,
-    #     # ))
 
-    #     print(load_bigquery_table(
-    #         _client,
-    #         table="bim-manufacturer-metadata.data_staging.erco_articles",
-    #         data=json.load(self.get_testdata("articles.json", file_like=True)),
-    #         schema=None,
-    #         full_schema=False,
-    #     ))
         
 
 if __name__ == "__main__":
