@@ -6,7 +6,7 @@ from typing import  Any, \
                     List, \
                     Union
 import warnings
-from load_datawarehouse.exceptions import WarehouseInvalidInput
+from load_datawarehouse.exceptions import WarehouseAPIFaked, WarehouseInvalidInput
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ except (ImportError, ModuleNotFoundError):
         ):
             warnings.warn("Optional module DictionaryTree not installed.")
 
-from load_datawarehouse.api import google, bigquery
+from load_datawarehouse.api import google, bigquery, bigquery_types
 from load_datawarehouse.config import   MAX_FACTOR_OF_RECORDS_WHICH_ADDS_FIELDS, \
                                         MIN_RECORDS_TO_TRIGGER_DIFF_CHECK
 import load_datawarehouse.schema
@@ -30,9 +30,9 @@ from load_datawarehouse.schema import ListField, DeconstructedRecords, Deconstru
 
 
 
-if (hasattr(bigquery._pandas_helpers, "_PANDAS_DTYPE_TO_BQ")):
+try:
     _PANDAS_DTYPE_TO_BQ = bigquery._pandas_helpers._PANDAS_DTYPE_TO_BQ
-else:
+except (AttributeError, WarehouseAPIFaked) as e:
     # If the code has changed, use the cached version
     # https://github.com/googleapis/python-bigquery/blob/750c15d8c7449776955237d01c24be7b4b66d0b5/google/cloud/bigquery/_pandas_helpers.py#L79
     _PANDAS_DTYPE_TO_BQ = {
@@ -106,7 +106,7 @@ def build_api_repr(
     fields:Iterable[
         Union[
             Dict[str,Any],
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
     ]=None,
     description:str="",
@@ -207,11 +207,11 @@ def is_api_repr(
 
 def convert_schema_to_api_repr(
     schema:Iterable[
-        bigquery.schema.SchemaField,
+        bigquery_types.SchemaField,
     ]
 ):
     def _conversion(obj:any):
-        if (isinstance(obj, bigquery.schema.SchemaField)):
+        if (isinstance(obj, bigquery_types.SchemaField)):
             _api_repr = obj.to_api_repr()
             if (obj.fields):
                 _api_repr["fields"] = convert_schema_to_api_repr(obj.fields)
@@ -238,8 +238,8 @@ def convert_api_repr_to_schema(
 ):
     def _conversion(obj:any):
         if (is_api_repr(obj)):
-            return bigquery.schema.SchemaField.from_api_repr(obj)
-        elif (isinstance(obj, bigquery.schema.SchemaField)):
+            return bigquery_types.SchemaField.from_api_repr(obj)
+        elif (isinstance(obj, bigquery_types.SchemaField)):
             return obj
         else:
             # This is not a valid input. Consider issuing warning?
@@ -257,7 +257,7 @@ def convert(
     schema:Iterable[
         Union[
             Dict[str,str],
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ]
     ],
     dest:str="dict",
@@ -273,7 +273,7 @@ def convert(
     }
 
     _type_switch[dict] = _type_switch.get("dict")
-    _type_switch[bigquery.schema.SchemaField] = _type_switch.get("SchemaField")
+    _type_switch[bigquery_types.SchemaField] = _type_switch.get("SchemaField")
 
     if (dest not in _type_switch):
         raise WarehouseInvalidInput(f"dest '{dest}' is not a valid input for convert_schema().")
@@ -286,10 +286,10 @@ def convert(
 
 def describe(
     schema:Union[
-        bigquery.table.Table,
+        bigquery_types.Table,
         Iterable[
             Union[
-                bigquery.schema.SchemaField,
+                bigquery_types.SchemaField,
                 Dict
                 ]
             ]
@@ -348,9 +348,9 @@ def describe(
 
     # if its a table, get the schema first
     if (isinstance(schema, (
-        bigquery.table.Table,
-        # bigquery.table.TableReference,
-        # bigquery.table.TableListItem,
+        bigquery_types.Table,
+        # bigquery_types.TableReference,
+        # bigquery_types.TableListItem,
     ))):
         # f"" already implies fu"" (python>=3.6); the latter is unsupported.
         # ...how disappointing.
@@ -388,7 +388,7 @@ def describe(
         _subtemplate = template.copy()
         _subtemplate[next(iter(_subtemplate.keys()))] -= indent
 
-        if (isinstance(_field, bigquery.schema.SchemaField)):
+        if (isinstance(_field, bigquery_types.SchemaField)):
             # Dicts are easier to work with here.
             _field = _field.to_api_repr()
 
@@ -427,7 +427,7 @@ def get_api_repr_from_record_fields(
     schema:Iterable[
         Union[
             Dict[str,str],
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ]
     ]=None,
     default:Union[
@@ -504,7 +504,7 @@ def get_schema_from_records(
     ],
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ] = {},
@@ -536,7 +536,7 @@ def get_schema_from_dataframe(
     dataframe:pd.DataFrame,
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ] = {},
@@ -562,7 +562,7 @@ def get_schema_from_dataframe_search_values(
     dataframe:pd.DataFrame,
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ] = {},
@@ -585,7 +585,7 @@ def get_schema_from_dataframe_google_native(
     dataframe:pd.DataFrame,
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ] = {},
@@ -605,7 +605,7 @@ def extract(
     ],
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ] = {},

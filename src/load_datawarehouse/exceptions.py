@@ -1,9 +1,18 @@
 from requests import exceptions
 
 class WarehouseAPIFaked(RuntimeError):
+    """
+    Special Exception:
+    
+    If an API failed to load, it will be substituted with an instance of this class.
+    """
     def __bool__(self):
         return False
     __nonzero__ = __bool__
+
+    def __getattr__(self, attr):
+        # This will be triggered if any attribute is sought.
+        raise self
 
 class WarehouseAPINotInstalled(WarehouseAPIFaked):
     pass

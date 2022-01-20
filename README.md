@@ -14,12 +14,12 @@
 
 ## Modules
 ### Cross Platform
-- load_datawarehouse.api
-- load_datawarehouse.config
-- load_datawarehouse.data
-- load_datawarehouse.schema
+- [load_datawarehouse.api](./src/load_datawarehouse/api)
+- [load_datawarehouse.config](./src/load_datawarehouse)
+- [load_datawarehouse.data](./src/load_datawarehouse/data)
+- [load_datawarehouse.schema](./src/load_datawarehouse)
 
 ### Platform Specific
-- load_datawarehouse.bigquery
-- load_datawarehouse.redshift
+- [load_datawarehouse.bigquery](./src/load_datawarehouse/bigquery)
+- [load_datawarehouse.redshift](./src/load_datawarehouse/redshift)
 - load_datawarehouse.snowflake

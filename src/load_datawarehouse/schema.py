@@ -10,7 +10,8 @@ import pandas as pd
 from load_datawarehouse.config import   MIN_RECORDS_TO_TRIGGER_DIFF_CHECK, \
                                         MAX_FACTOR_OF_RECORDS_WHICH_ADDS_FIELDS                                
 
-from load_datawarehouse.api import bigquery
+from load_datawarehouse.api import bigquery, bigquery_types
+
 
 import load_datawarehouse.data
 
@@ -44,17 +45,17 @@ DeconstructedList = namedtuple("DeconstructedList", [
 
 field_name_switch = {
     dict: lambda _dict: _dict.get("name", None),
-    bigquery.schema.SchemaField: lambda _bq_schema_field: _bq_schema_field.name,
+    bigquery_types.SchemaField: lambda _bq_schema_field: _bq_schema_field.name,
 }
 
 field_type_switch = {
     dict: lambda _dict: _dict.get("type", None),
-    bigquery.schema.SchemaField: lambda _bq_schema_field: _bq_schema_field.field_type,
+    bigquery_types.SchemaField: lambda _bq_schema_field: _bq_schema_field.field_type,
 }
 
 sub_fields_switch = {
     dict: lambda _dict: _dict.get("fields", []),
-    bigquery.schema.SchemaField: lambda _bq_schema_field: _bq_schema_field.fields,
+    bigquery_types.SchemaField: lambda _bq_schema_field: _bq_schema_field.fields,
 }
 
 
@@ -127,7 +128,7 @@ def get_field_from_schema(
     field_name:str,
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ],
@@ -140,7 +141,7 @@ def get_field_from_schema(
         )(_field)
 
         if (_field_name == field_name):
-            if (convert_to_api_repr and isinstance(_field, bigquery.schema.SchemaField)):
+            if (convert_to_api_repr and isinstance(_field, bigquery_types.SchemaField)):
                 # TODO: This does not currently deal with sub-fields at all
                 _field = _field.to_api_repr()
 
@@ -152,12 +153,12 @@ def convert_schema_field_to_record_field(
     schema:Union[
         Iterable[
             Union[
-                bigquery.schema.SchemaField,
+                bigquery_types.SchemaField,
                 Dict[str,Any],
             ],
         ],
         Union[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
             Dict,
         ],
     ],
@@ -201,7 +202,7 @@ def condense_record_fields(
     force_numeric:bool=False,
     schema:Union[
         Iterable[
-            bigquery.schema.SchemaField,
+            bigquery_types.SchemaField,
         ],
         Dict,
     ] = [],
