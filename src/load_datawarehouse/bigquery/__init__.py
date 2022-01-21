@@ -402,7 +402,35 @@ if (not isinstance(google, Exception) and \
     #=====================================================================================================================================================================
 
     class DataWarehouse_BigQuery(DataWarehouse):
-        pass
+        # TODO
+        @classmethod
+        def get(self):
+            pass
+        
+        # TODO
+        @classmethod
+        def new(self):
+            pass
+        
+        # TODO
+        def touch(self):
+            pass
+
+        # TODO
+        def fetch(self):
+            pass
+
+        # TODO
+        def load(self):
+            pass
+
+        # TODO
+        def update(self):
+            pass
+
+        # TODO
+        def delete(self):
+            pass
 
     
 

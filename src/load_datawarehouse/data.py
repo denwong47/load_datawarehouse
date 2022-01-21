@@ -1,7 +1,6 @@
 import os, sys
 
 import json
-import math
 import random
 import re
 from typing import Any, Dict, Iterable, List, Union
@@ -10,14 +9,46 @@ import pandas as pd
 
 from load_datawarehouse.exceptions import WarehouseRowOversize
 
+
 def clean_field_key(key:str)->str:
+    """
+    Substitute all prohibited characters in field names with an underscore.
+    Probited characters are defined as any non-word/digit characters.
+
+    As the field names will be used in a NamedTuple, which goes by the syntax:
+        NamedTupleClass(field_name1=something, field_name2=something...)
+    all field names have to be allowable in python syntax as well.
+    """
     if (not isinstance(key, str)):
         key = str(key)
         
     _prohibited = re.compile(r"\W")
     return _prohibited.sub("_", key)
 
+
+def clean_keys(obj:Any)->Any:
+    """
+    Universal function for cleaning the keys/columns of multiple types of objects.
+    """
+    _default = lambda obj: obj
+
+    _type_switch = {
+        dict: clean_dict_keys,
+        list: clean_list_keys,
+        pd.DataFrame: clean_dataframe_keys,
+    }
+
+    return _type_switch.get(
+        type(obj),
+        _default
+    )(
+        obj
+    )
+
 def clean_dict_keys(dictobj:Dict[Any, Any])->Dict[str, Any]:
+    """
+    As per clean_field_key(), but takes a dictionary as arguments.
+    """
     if (isinstance(dictobj, dict)):
         return {
             clean_field_key(_key): clean_keys(_value) \
@@ -27,6 +58,9 @@ def clean_dict_keys(dictobj:Dict[Any, Any])->Dict[str, Any]:
         return clean_keys(dictobj)
 
 def clean_list_keys(listobj:List[Any])->List[Any]:
+    """
+    As per clean_field_key(), but takes an iterable as arguments.
+    """
     if (isinstance(listobj, (list, tuple))):
         return [
             clean_keys(_item) for _item in listobj
@@ -35,11 +69,26 @@ def clean_list_keys(listobj:List[Any])->List[Any]:
         return clean_keys(listobj)
 
 def clean_dataframe_keys(dataframe:pd.DataFrame)->pd.DataFrame:
+    """
+    As per clean_field_key(), but takes a Pandas Dataframe as arguments.
+
+    This clean up both the columns of the dataframe,
+    as well as values of any columns that are Objects in dtype.
+
+    e.g. if one column contains dicts as its values, this function will cycle through them too.
+    """
     dataframe = clean_dataframe_columns(dataframe)
     dataframe = clean_dataframe_values(dataframe)
     return dataframe # We are muting pd.DataFrame in place so returning this or not does not actually matter
 
+
+
 def clean_dataframe_values(dataframe:pd.DataFrame)->pd.DataFrame:
+    """
+    Clean up the values of any columns that are Objects in dtype.
+
+    e.g. if one column contains dicts as its values, this function will clean the keys of those.
+    """
     _object_columns = dataframe.select_dtypes(include='object')
 
     def clean_row(row:pd.Series)->pd.Series:
@@ -61,27 +110,15 @@ def clean_dataframe_values(dataframe:pd.DataFrame)->pd.DataFrame:
     return dataframe
 
 def clean_dataframe_columns(dataframe:pd.DataFrame)->pd.DataFrame:
+    """
+    Clean up the name of all columns in a DataFrame.
+    """
     _mapper = {
         _column:clean_field_key(_column) \
             for _column in dataframe.columns
     }
     return dataframe.rename(_mapper, inplace=False)
 
-def clean_keys(obj:Any)->Any:
-    _default = lambda obj: obj
-
-    _type_switch = {
-        dict: clean_dict_keys,
-        list: clean_list_keys,
-        pd.DataFrame: clean_dataframe_keys,
-    }
-
-    return _type_switch.get(
-        type(obj),
-        _default
-    )(
-        obj
-    )
 
 def prepare(
     data:Union[
@@ -89,6 +126,11 @@ def prepare(
         pd.DataFrame
     ],
 ):
+    """
+    Prepare data for use, such as :
+    1. cleaning the keys
+    2. turning the data into records (list of dicts)
+    """
     data = clean_keys(data)
     if (isinstance(data, list)):
         pass
@@ -104,6 +146,14 @@ def json_size(
         pd.DataFrame
     ],
 ):
+    """
+    Calculate the size of records or DataFrame in json format.
+    
+    Since JSON is a common format for data loading, which occasionally has size limits,
+    this function allows JSON size to be checked prior to uploading.
+
+    See chunks() function for a better solution to chunk up JSONs by size.
+    """
     if (isinstance(data, pd.DataFrame)):
         return sys.getsizeof(
             data.to_json(
@@ -130,6 +180,12 @@ def sample(
     ],
     size:int,
 ):
+    """
+    Randomly sample a number of records from data.
+
+    Primarily for internal use only in chunks().
+    """
+
     if (isinstance(data, pd.DataFrame)):
         return data.sample(
             n=size,
@@ -149,6 +205,11 @@ def subset(
     start:int,
     size:int,
 ):
+    """
+    Return a specific range of records in data.
+
+    Primarily for internal use only in chunks().
+    """
     if (isinstance(data, pd.DataFrame)):
         return data.iloc[start:start+size, :]
     else:

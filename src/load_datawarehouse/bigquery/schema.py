@@ -23,8 +23,10 @@ except (ImportError, ModuleNotFoundError):
             warnings.warn("Optional module DictionaryTree not installed.")
 
 from load_datawarehouse.api import google, bigquery, bigquery_types
-from load_datawarehouse.config import   MAX_FACTOR_OF_RECORDS_WHICH_ADDS_FIELDS, \
-                                        MIN_RECORDS_TO_TRIGGER_DIFF_CHECK
+
+# -- This has not been implemented
+# from load_datawarehouse.config import   MAX_FACTOR_OF_RECORDS_WHICH_ADDS_FIELDS, \
+#                                         MIN_RECORDS_TO_TRIGGER_DIFF_CHECK
 import load_datawarehouse.schema
 from load_datawarehouse.schema import ListField, DeconstructedRecords, DeconstructedList, is_records
 
@@ -53,10 +55,19 @@ except (AttributeError, WarehouseAPIFaked) as e:
 
 
 class SchemaFieldProperties(enum.Enum):
+    """
+    Superclass
+    
+    With SchemaFieldProperties as the superclass,
+    all properties below has a string value equal to their name.
+    """
     def _generate_next_value_(name, start, count, last_values):
         return name
 
 class SchemaFieldType(SchemaFieldProperties):
+    """
+    BigQuery SchemaField types
+    """
     STRING      = enum.auto()
     BYTES       = enum.auto()
     INTEGER     = enum.auto()
@@ -75,6 +86,9 @@ class SchemaFieldType(SchemaFieldProperties):
     RECORD      = enum.auto()
 
 class SchemaFieldMode(SchemaFieldProperties):
+    """
+    BigQuery SchemaField modes
+    """
     NULLABLE    = enum.auto()
     REQUIRED    = enum.auto()
     REPEATED    = enum.auto()
