@@ -6,7 +6,7 @@
 
  Combined with the fact that these are Cloud services subject to outages, planned obsolescence and non-fixed pricing structures, it is evident that apps built solely upon one single SaaS implementation will be significantly disadvantaged when that SaaS no longer provide favourable terms.
 
- This module sets out to address this by providing a transparent layer between the SaaS bespoke APIs and the actual application, allowing developers to switch from one platform to another by changing the subclass of a `Warehouse` instance.
+ This module sets out to address this by providing a transparent layer between the SaaS bespoke APIs and the actual application, allowing developers to switch from one platform to another by changing the subclass of a `DataWarehouse` instance.
  
  The difficulty is that out of the 3, only GCP provides a free tier for permanent use of BigQuery, while AWS and Snowflake both offers trial periods only. With this being a solo hobbyist project, completing the subclasses for all 3 platforms will be very time consuming; so any help would be appreciated.
 
@@ -15,11 +15,11 @@
 ## Modules
 ### Cross Platform
 - [load_datawarehouse.api](./src/load_datawarehouse/api)
-- [load_datawarehouse.config](./src/load_datawarehouse)
-- [load_datawarehouse.data](./src/load_datawarehouse/data)
-- [load_datawarehouse.schema](./src/load_datawarehouse)
+- [load_datawarehouse.config](./src/load_datawarehouse/config.py)
+- [load_datawarehouse.data](./src/load_datawarehouse/data.py)
+- [load_datawarehouse.schema](./src/load_datawarehouse/schema.py)
 
 ### Platform Specific
 - [load_datawarehouse.bigquery](./src/load_datawarehouse/bigquery)
-- [load_datawarehouse.redshift](./src/load_datawarehouse/redshift)
-- load_datawarehouse.snowflake
+- [load_datawarehouse.redshift](./src/load_datawarehouse/redshift) _(Placeholder only)_
+- [load_datawarehouse.snowflake](./src/load_datawarehouse/snowflake) _(Placeholder only)_

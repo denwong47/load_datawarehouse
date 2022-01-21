@@ -11,3 +11,6 @@ from load_datawarehouse.bigquery import DataWarehouse_BigQuery
 
 import load_datawarehouse.redshift as redshift
 from load_datawarehouse.redshift import DataWarehouse_RedShift
+
+import load_datawarehouse.snowflake as snowflake
+# from load_datawarehouse.snowflake import DataWarehouse_SnowFlake
