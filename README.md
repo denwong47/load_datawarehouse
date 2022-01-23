@@ -1,6 +1,9 @@
 # load_datawarehouse
  Load data into common cloud warehousing SaaSs.
 
+## Status
+ _Base functions operational; classes are WIP._
+
 ## Premise of this module
  The industry's move from self hosted SQL to Data Warehouses on the Cloud marked a divergence of standards. While SQL distributions have their unique characteristics and data types etc, they are in broad terms interoperable. This is different from a contemporary migration among BigQuery, Redshift and Snowflake, each of which has independently developed API and data structures. As these service providers aim to provide unique features to entice existing on-prem database users, these unique traits will further reduce interoperability in the long run, not unlike the browser wars of early internet during which the supposed standard of HTML/JS/CSS diverge into a chaotic scene of unpredictable behaviours.
 

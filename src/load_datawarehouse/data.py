@@ -3,7 +3,7 @@ import os, sys
 import json
 import random
 import re
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Dict, Generator, Iterable, List, Union
 
 import pandas as pd
 
@@ -125,7 +125,10 @@ def prepare(
         Iterable[Dict[str,str]],
         pd.DataFrame
     ],
-):
+)->Union[
+    List[Dict[str, Any]],
+    pd.DataFrame,
+]:
     """
     Prepare data for use, such as :
     1. cleaning the keys
@@ -145,7 +148,7 @@ def json_size(
         Iterable[Dict[str,str]],
         pd.DataFrame
     ],
-):
+)->int:
     """
     Calculate the size of records or DataFrame in json format.
     
@@ -179,7 +182,10 @@ def sample(
         pd.DataFrame
     ],
     size:int,
-):
+)->Union[
+    List[Dict[str, Any]],
+    pd.DataFrame,
+]:
     """
     Randomly sample a number of records from data.
 
@@ -204,7 +210,10 @@ def subset(
     ],
     start:int,
     size:int,
-):
+)->Union[
+    List[Dict[str, Any]],
+    pd.DataFrame,
+]:
     """
     Return a specific range of records in data.
 
@@ -222,7 +231,14 @@ def chunks(
     ],
     size_limit:int=20*(2**20), # 20MB is BigQuery's default JSON limit
     max_iteration:int=6,
-):
+)->Generator[
+    Union[
+        List[Dict[str, Any]],
+        pd.DataFrame,
+    ],
+    None,
+    None
+]:
     """
     Generator function to slice the data into chunks, guaranteed to be below a maximum size.
 
