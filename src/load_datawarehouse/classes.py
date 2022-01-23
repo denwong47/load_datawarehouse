@@ -1,4 +1,11 @@
+from datetime import datetime
+from enum import Enum, auto
+from typing import Any
 from abc import abstractmethod, abstractclassmethod
+
+class QuerySort(Enum):
+    ASCENDING = "ASC"
+    DESCENDING = "DESC"
 
 class DataWarehouseMeta(type):
     """
@@ -19,23 +26,31 @@ class DataWarehouse(metaclass=DataWarehouseMeta):
     """
 
     @abstractclassmethod
-    def get(self):
+    def get(cls, table:Any, **kwargs):
         pass
 
     @abstractclassmethod
-    def new(self):
+    def select(cls, table:Any, **kwargs):
+        pass
+
+    @abstractclassmethod
+    def new(cls, table:Any, replace:bool, schema:Any, expires:datetime, **kwargs):
         pass
     
     @abstractmethod
-    def touch(self):
+    def rebuild(self, schema:Any, expires:datetime, **kwargs):
         pass
 
     @abstractmethod
-    def fetch(self):
+    def query(self, query:str):
         pass
 
     @abstractmethod
-    def load(self):
+    def fetch(self, fields:Any, sort:Any, count:int, **kwargs):
+        pass
+
+    @abstractmethod
+    def load(self, data:Any, schema:Any, **kwargs):
         pass
 
     @abstractmethod
@@ -45,6 +60,8 @@ class DataWarehouse(metaclass=DataWarehouseMeta):
     @abstractmethod
     def delete(self):
         pass
+
+    drop = delete
 
 class DataWarehouseUnavailable(metaclass=DataWarehouseMeta):
     """

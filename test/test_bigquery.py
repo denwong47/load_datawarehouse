@@ -21,7 +21,8 @@ TEST_DATASET = "bim-manufacturer-metadata.api_test_dataset"
 with EnvironmentContext(update=env_update):
     from test_load_datawarehouse import TestBaseClass, TestLoadDataWarehouse
     from load_datawarehouse.api import google, bigquery
-    from load_datawarehouse.bigquery import is_online, \
+    from load_datawarehouse.bigquery import DataWarehouse_BigQuery, \
+                                            is_online, \
                                             locations, \
                                             apply_changes_bigquery_table, \
                                             create_bigquery_table, \
