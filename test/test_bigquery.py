@@ -15,6 +15,9 @@ env_update={
     "GOOGLE_APPLICATION_CREDENTIALS":"/opt/credentials/BigQuery/bim-manufacturer-metadata/api-key.json",
 }
 
+# Replace with your own project.dataset
+TEST_DATASET = "bim-manufacturer-metadata.api_test_dataset"
+
 with EnvironmentContext(update=env_update):
     from test_load_datawarehouse import TestBaseClass, TestLoadDataWarehouse
     from load_datawarehouse.api import google, bigquery
@@ -443,7 +446,7 @@ class TestBigQuery(TestBaseClass): # We can use TestLoadDataWarehouse instead if
     def test_set_expiry_bigquery_table(self):
         global _client
 
-        _test_table = "bim-manufacturer-metadata.api_test_dataset.api_test_table"
+        _test_table = f"{TEST_DATASET}.api_test_table"
         _7_days_from_now = (datetime.utcnow() + timedelta(days = 7)).replace(microsecond=0, tzinfo=pytz.utc)
         _never = None
         
@@ -482,7 +485,7 @@ class TestBigQuery(TestBaseClass): # We can use TestLoadDataWarehouse instead if
     def test_create_set_drop_table(self):
         global _client
 
-        _test_table = "bim-manufacturer-metadata.api_test_dataset.api_create_drop_table"
+        _test_table = f"{TEST_DATASET}.api_create_drop_table"
         _1_hour_from_now = (datetime.utcnow() + timedelta(hours = 1)).replace(microsecond=0, tzinfo=pytz.utc)
         # _location = locations.EUROPE_WEST2
 
